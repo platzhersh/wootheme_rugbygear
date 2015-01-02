@@ -454,7 +454,6 @@ table td {
 }
 table th {
   text-transform: uppercase;
-  border-bottom: 4px double #e6e6e6;
 }
 table tr th:first-child,
 table tr td:first-child {
@@ -678,7 +677,7 @@ ul.nav li a {
 }
 #footer {
   padding: 2.618em 0;
-  border-top: 1px solid #e6e6e6;
+  border-top: 1px solid #676767;
   color: #808080;
 }
 #footer #credit img {
@@ -2336,7 +2335,7 @@ ul#shipping_method {
   padding-left: 1em;
 }
 .checkout #order_review #payment ul {
-  border-bottom: 4px double #e6e6e6;
+  border-bottom: 1px solid #e6e6e6;
 }
 .checkout #order_review #payment ul li {
   list-style: none;
