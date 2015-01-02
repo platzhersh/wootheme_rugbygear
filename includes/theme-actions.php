@@ -11,7 +11,6 @@ if ( ! empty( $_SERVER['SCRIPT_FILENAME'] ) && basename( __FILE__ ) == basename(
 TABLE OF CONTENTS
 
 - Theme Setup
-- Load layout.css in the <head>
 - Load responsive <meta> tags in the <head>
 - Add custom styling to HEAD
 - Add custom typograhpy to HEAD
@@ -81,21 +80,6 @@ if ( ! function_exists( 'woothemes_setup' ) ) {
 
 global $default_google_fonts;
 $default_google_fonts = array( 'Bree Serif', 'Open Sans', 'Schoolbell' );
-
-
-/*-----------------------------------------------------------------------------------*/
-/* Load layout.css in the <head> */
-/*-----------------------------------------------------------------------------------*/
-
-if ( ! is_admin() ) { add_action( 'get_header', 'woo_load_frontend_css', 10 ); }
-
-if ( ! function_exists( 'woo_load_frontend_css' ) ) {
-	function woo_load_frontend_css () {
-		wp_register_style( 'woo-layout', get_template_directory_uri() . '/css/layout.css' );
-
-		wp_enqueue_style( 'woo-layout' );
-	} // End woo_load_frontend_css()
-}
 
 /*-----------------------------------------------------------------------------------*/
 /* Load responsive <meta> tags in the <head> */

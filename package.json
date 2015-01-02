@@ -1,0 +1,33 @@
+{
+  "name": "wootheme_rugbygear",
+  "version": "0.1.0",
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-uglify": "~0.7.0",
+    "grunt-contrib-less": "~1.0.0",
+    "less": "~2.1.2",
+    "grunt-uncss": "~0.3.8"
+  },
+  "description": "wootheme_rugbygear\r ==================",
+  "main": "index.php",
+  "dependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-uglify": "~0.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/platzhersh/wootheme_rugbygear.git"
+  },
+  "keywords": [
+    "wordpress",
+    "php",
+    "wootheme",
+    "woocommerce",
+    "theme"
+  ],
+  "author": "platzh1rsch",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/platzhersh/wootheme_rugbygear/issues"
+  }
+}

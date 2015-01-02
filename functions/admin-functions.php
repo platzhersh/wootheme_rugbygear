@@ -872,39 +872,6 @@ function woo_show_pagemenu( $exclude = '' ) {
     echo $pages;
 } // End woo_show_pagemenu()
 
-/*-----------------------------------------------------------------------------------*/
-/* Get the style path currently selected */
-/*-----------------------------------------------------------------------------------*/
-function woo_style_path() {
-	$return = '';
-
-	$style = $_REQUEST['style'];
-
-	// Sanitize request input.
-	$style = esc_attr( strtolower( trim( strip_tags( $style ) ) ) );
-
-	if ( $style != '' ) {
-		$style_path = $style;
-	} else {
-		$stylesheet = esc_attr( get_option( 'woo_alt_stylesheet' ) );
-
-		// Prevent against an empty return to $stylesheet.
-		if ( $stylesheet == '' ) {
-			$stylesheet = 'default.css';
-		}
-
-		$style_path = str_replace( '.css', '', $stylesheet );
-	}
-
-	if ( $style_path == 'default' ) {
-		$return = 'images';
-	} else {
-		$return = 'styles/' . $style_path;
-	}
-
-	echo esc_html( $return );
-} // End woo_style_path()
-
 
 /*-----------------------------------------------------------------------------------*/
 /* Get page ID */

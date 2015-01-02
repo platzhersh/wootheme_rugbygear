@@ -113,9 +113,6 @@ if ( ! function_exists( 'woothemes_wp_head' ) ) {
  */
 function woothemes_wp_head() {
 	do_action( 'woothemes_wp_head_before' );
-	// Output alternative stylesheet
-	if ( function_exists( 'woo_output_alt_stylesheet' ) )
-		woo_output_alt_stylesheet();
 	// Output custom favicon
 	if ( function_exists( 'woo_output_custom_favicon' ) )
 		woo_output_custom_favicon();
@@ -133,43 +130,6 @@ function woothemes_wp_head() {
 }
 add_action( 'wp_head', 'woothemes_wp_head', 10 );
 
-
-if ( ! function_exists( 'woo_output_alt_stylesheet' ) ) {
-/**
- * Output the alternative stylesheet.
- * @since  2.0.0
- * @return void
- */
-function woo_output_alt_stylesheet() {
-	$style = '';
-
-	if ( isset( $_REQUEST['style'] ) ) {
-		$requested_style = esc_attr( strtolower( strip_tags( trim( $_REQUEST['style'] ) ) ) );
-		$style = $requested_style;
-	}
-
-	echo "\n" . '<!-- Alt Stylesheet -->' . "\n";
-	// If we're using the query variable, be sure to check for /css/layout.css as well.
-	if ( $style != '' ) {
-		if ( strtolower( $style ) == 'default' ) {
-			if ( file_exists( get_template_directory() . '/css/layout.css' ) ) {
-				echo '<link href="' . esc_url( get_template_directory_uri() . '/css/layout.css' ) . '" rel="stylesheet" type="text/css" />' . "\n";
-			}
-			echo '<link href="' . esc_url( get_stylesheet_uri() ) . '" rel="stylesheet" type="text/css" />' . "\n";
-		} else {
-			echo '<link href="' . esc_url( get_template_directory_uri() . '/styles/' . $style . '.css' ) . '" rel="stylesheet" type="text/css" />' . "\n";
-		}
-	} else {
-		$style = get_option( 'woo_alt_stylesheet' );
-		$style = esc_attr( strtolower( strip_tags( trim( $style ) ) ) );
-		if( $style != '' ) {
-			echo '<link href="'. esc_url( get_template_directory_uri() . '/styles/'. $style ) . '" rel="stylesheet" type="text/css" />' . "\n";
-		} else {
-			echo '<link href="'. esc_url( get_template_directory_uri() . '/styles/default.css' ) . '" rel="stylesheet" type="text/css" />' . "\n";
-		}
-	}
-} // End woo_output_alt_stylesheet()
-}
 
 if ( ! function_exists( 'woo_output_custom_favicon' ) ) {
 /**
