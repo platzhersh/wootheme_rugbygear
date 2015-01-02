@@ -26,6 +26,8 @@ custom.css and it will override the style in this file. You have been warned! :)
 
 INDEX:
 
+PRE-IMPORTS
+
 0. RESET
 
 1. SETUP
@@ -83,6 +85,7 @@ INDEX:
 -8.2 Gravity forms
 -8.3 IE specific styling
 
+POST-IMPORTS
 -------------------------------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------------------------------*/
@@ -132,10 +135,10 @@ mark {
 }
 
 /*-------------------------------------------------------------------------------------------*/
-/* IMPORTS */
+/* PRE-IMPORTS */
 /*-------------------------------------------------------------------------------------------*/
 
-@import url(css/mixins.less);
+@import url('css/mixins.less');
 
 /*-------------------------------------------------------------------------------------------*/
 /* 1. SETUP */
@@ -298,7 +301,6 @@ table {
 	}
 	th {
 		text-transform: uppercase;
-		border-bottom:4px double @border_main;
 	}
 	tr {
 		th, td {
@@ -513,7 +515,7 @@ ul.nav { // Styles applied to all instances of navigation
 }
 #footer{
 	padding: 2.618em 0;
-	border-top: 1px solid @border_main;
+	border-top: 1px solid @color_body;
 	color: lighten(@color_body, 10%);
 	#credit {
 		img {
@@ -2013,7 +2015,7 @@ ul#shipping_method {
 		}
 		#payment {
 			ul {
-				border-bottom:4px double @border_main;
+				border-bottom:1px solid @border_main;
 				li {
 					list-style: none;
 					margin-bottom:1em;
@@ -2600,3 +2602,9 @@ img.ui-datepicker-trigger { border: 0; padding:0; }
 		}
 	}
 }
+
+/*-------------------------------------------------------------------------------------------*/
+/* POST-IMPORTS */
+/*-------------------------------------------------------------------------------------------*/
+
+@import url('css/layout.less');

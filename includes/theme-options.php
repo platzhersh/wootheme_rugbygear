@@ -30,19 +30,6 @@ foreach ($woo_pages_obj as $woo_page) {
     $woo_pages[$woo_page->ID] = $woo_page->post_name; }
 $woo_pages_tmp = array_unshift($woo_pages, 'Select a page:' );
 
-//Stylesheets Reader
-$alt_stylesheet_path = get_template_directory() . '/styles/';
-$alt_stylesheets = array();
-if ( is_dir($alt_stylesheet_path) ) {
-    if ($alt_stylesheet_dir = opendir($alt_stylesheet_path) ) {
-        while ( ($alt_stylesheet_file = readdir($alt_stylesheet_dir)) !== false ) {
-            if(stristr($alt_stylesheet_file, '.css') !== false) {
-                $alt_stylesheets[] = $alt_stylesheet_file;
-            }
-        }
-    }
-}
-
 //More Options
 $other_entries = array( '0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19' );
 
@@ -57,13 +44,6 @@ $options[] = array( 'name' => __( 'General Settings', 'woothemes' ),
 
 $options[] = array( 'name' => __( 'Quick Start', 'woothemes' ),
     				'type' => 'subheading' );
-
-$options[] = array( 'name' => __( 'Theme Stylesheet', 'woothemes' ),
-    				'desc' => __( 'Select your themes alternative color scheme.', 'woothemes' ),
-    				'id' => $shortname . '_alt_stylesheet',
-    				'std' => 'default.css',
-    				'type' => 'select',
-    				'options' => $alt_stylesheets );
 
 $options[] = array( 'name' => __( 'Custom Logo', 'woothemes' ),
     				'desc' => __( 'Upload a logo for your theme, or specify an image URL directly.', 'woothemes' ),
