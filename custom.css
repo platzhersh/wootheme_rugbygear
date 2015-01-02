@@ -579,6 +579,12 @@ li.product.type-product.sale::before {
 	background: #4d65a4;
 	border-color: #4d65a4;
 }
+.woocommerce_info:before,
+.woocommerce-info:before {
+  content: "S";
+  color: #fff;
+}
+
 .woocommerce_message:before,
 .woocommerce-message:before {
   content: ".";
