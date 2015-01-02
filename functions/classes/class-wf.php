@@ -136,7 +136,7 @@ final class WF {
 	 * @return  void
 	 */
 	public function get_placeholder_image_url () {
-		return esc_url( apply_filters( 'wf_placeholder_image_url', $this->get_assets_url() . 'images/placeholder.png' ) );
+		return esc_url( apply_filters( 'wf_placeholder_image_url', '' ) );
 	} // End get_placeholder_image_url()
 
 	/**
@@ -146,7 +146,7 @@ final class WF {
 	 * @return  void
 	 */
 	public function get_placeholder_image_path () {
-		return apply_filters( 'wf_placeholder_image_path', $this->get_assets_path() . 'images/placeholder.png' );
+		return apply_filters( 'wf_placeholder_image_path', '' );
 	} // End get_placeholder_image_path()
 
 	/**

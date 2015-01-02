@@ -314,7 +314,7 @@ class WF_Fields {
 
 				// If we have an internal method for validation, filter and apply it.
 				if ( '' != $method ) {
-					add_filter( 'wf_validate_field_' . $fields[$k]['type'], array( $this, $method ) );
+					add_filter( 'wf_validate_field_' . $fields[$k]['type'], array( $this, $method ), 10, 2 );
 				}
 
 				$method_output = apply_filters( 'wf_validate_field_' . $fields[$k]['type'], $v, $fields[$k] );
@@ -347,7 +347,7 @@ class WF_Fields {
 	 * @since   6.0.0
 	 * @return  void
 	 */
-	public function validate_field_textarea ( $v ) {
+	public function validate_field_textarea ( $v, $k ) {
 		// Allow iframe, object and embed tags in textarea fields.
 		$allowed = wp_kses_allowed_html( 'post' );
 		$allowed['iframe'] = array( 'src' => true, 'width' => true, 'height' => true, 'id' => true, 'class' => true, 'name' => true );
@@ -410,7 +410,7 @@ class WF_Fields {
 	 * @return string
 	 */
 	public function validate_field_slider ( $v ) {
-		$v = number_format( floatval( $v ), 1 );
+		$v = floatval( $v );
 
 		return $v;
 	} // End validate_field_slider()
@@ -480,7 +480,8 @@ class WF_Fields {
 			}
 		}
 
-		$v = array_map( 'esc_html', $v );
+		$v = array_map( 'strip_tags', $v );
+		$v = array_map( 'stripslashes', $v );
 
 		return $v;
 	} // End validate_field_typography()
@@ -721,7 +722,13 @@ class WF_Fields {
 			'color' => get_option( $key . '_color', '' )
 			);
 
-		$defaults = wp_parse_args( $defaults, $args['std'] ); // Make sure we use our default values, if they exist. Make sure we use old data first, if it exists, in order to correctly preserve it.
+		if ( 0 < count( $defaults ) && isset( $args['std'] ) && is_array( $args['std'] ) ) {
+			foreach ( $defaults as $k => $v ) {
+				if ( '' == $v && isset( $args['std'][$k] ) ) {
+					$defaults[$k] = $args['std'][$k];
+				}
+			}
+		}
 
 		$value = $this->get_value( $key, $defaults );
 
@@ -747,8 +754,8 @@ class WF_Fields {
 
 		/* Size in Pixels */
 		$html .= '<select class="woo-typography woo-typography-size woo-typography-size-px hide-if-em" name="'. esc_attr( $key . '[size_px]' ) . '" id="'. esc_attr( $key . '_size' ) . '">' . "\n";
-		for ( $i = 9; $i < intval( apply_filters( 'wf_fields_typography_font_size_px_upper_limit', 71 ) ); $i++ ) {
-			$html .= '<option value="'. esc_attr( $i ) .'" ' . selected( intval( $value['size'] ), $i, false ) . '>'. esc_html( $i ) . '</option>' . "\n";
+		for ( $i = 9; $i < floatval( apply_filters( 'wf_fields_typography_font_size_px_upper_limit', 71 ) ); $i++ ) {
+			$html .= '<option value="'. esc_attr( $i ) .'" ' . selected( floatval( $value['size'] ), $i, false ) . '>'. esc_html( $i ) . '</option>' . "\n";
 		}
 		$html .= '</select>' . "\n";
 
@@ -767,7 +774,7 @@ class WF_Fields {
 			if( strval( $em ) == $value['size'] ) {
 				$active = 'selected="selected"';
 			}
-			$html .= '<option value="' . esc_attr( intval( $em ) ) . '" ' . $active . '>' . esc_html( $em ) . '</option>';
+			$html .= '<option value="' . esc_attr( floatval( $em ) ) . '" ' . $active . '>' . esc_html( $em ) . '</option>';
 		}
 		$html .= '</select>' . "\n";
 
@@ -782,7 +789,7 @@ class WF_Fields {
 		$html .= '</select>' . "\n";
 
 		/* Weights */
-		$font_weights = (array) apply_filters( 'wf_fields_typography_font_weights', array( '300' => __( 'Thin', 'woothemes' ), '300 italic' => __( 'Thin Italic', 'woothemes' ), 'normal' => __( 'Normal', 'woothemes' ), 'italic' => __( 'Italic', 'woothemes' ), 'bold' => __( 'Bold', 'woothemes' ), 'bolditalic' => __( 'Bold/Italic', 'woothemes' ) ) );
+		$font_weights = (array) apply_filters( 'wf_fields_typography_font_weights', array( '300' => __( 'Thin', 'woothemes' ), '300 italic' => __( 'Thin Italic', 'woothemes' ), 'normal' => __( 'Normal', 'woothemes' ), 'italic' => __( 'Italic', 'woothemes' ), 'bold' => __( 'Bold', 'woothemes' ), 'bold italic' => __( 'Bold/Italic', 'woothemes' ) ) );
 
 		if ( 0 < count( $font_weights ) ) {
 			$html .= '<select class="woo-typography woo-typography-font-weight woo-typography-style" name="'. esc_attr( $key . '[style]' ) . '" id="'. esc_attr( $key . '_style' ) . '">' . "\n";
@@ -811,12 +818,13 @@ class WF_Fields {
 			$html .= '<select class="woo-typography woo-typography-font-face woo-typography-face" name="'. esc_attr( $key . '[face]' ) . '" id="'. esc_attr( $key . '_face' ) . '">' . "\n";
 			foreach ( $font_faces as $k => $v ) {
 				$selected = '';
+				// If one of the fonts requires a test case, use that value. Otherwise, use the key as the test case.
 				if ( in_array( $k, array_keys( $test_cases ) ) ) {
 					$value_to_test = $test_cases[$k];
 				} else {
 					$value_to_test = $k;
 				}
-				if ( ( $value_to_test == $value['face'] )/* || strpos( $value['face'], $value_to_test ) !== false*/ ) $selected = ' selected="selected"';
+				if ( $this->_test_typeface_against_test_case( $value['face'], $value_to_test ) ) $selected = ' selected="selected"';
 				$html .= '<option value="' . esc_attr( $k ) . '" ' . $selected . '>' . esc_html( $v ) . '</option>' . "\n";
 			}
 			$html .= '</select>' . "\n";
@@ -828,6 +836,28 @@ class WF_Fields {
 		$html .= '</span>' . "\n";
 		return $html;
 	} // End render_field_typography()
+
+	/**
+	 * Test whether or not a typeface has been selected for a "typography" field.
+	 * @access  protected
+	 * @since   6.0.2
+	 * @param   string $face      The noble warrior (typeface) to be tested.
+	 * @param   string $test_case The test case. Does the warrior pass the ultimate test and reep eternal glory?
+	 * @return  bool       		  Whether or not eternal glory shall be achieved by the warrior.
+	 */
+	protected function _test_typeface_against_test_case ( $face, $test_case ) {
+		$response = false;
+
+		$face = stripslashes( str_replace( '"', '', str_replace( '&quot;', '', $face ) ) );
+
+		$parts = explode( ',', $face );
+
+		if ( $test_case == $parts[0] ) {
+			$response = true;
+		}
+
+		return $response;
+	} // End _test_typeface_against_test_case()
 
 	/**
 	 * Render HTML markup for the "border" field type.
@@ -847,7 +877,13 @@ class WF_Fields {
 			'color' => get_option( $key . '_color', '' )
 			);
 
-		$defaults = wp_parse_args( $defaults, $args['std'] ); // Make sure we use our default values, if they exist. Process the older values first, in case we had any.
+		if ( 0 < count( $defaults ) && isset( $args['std'] ) && is_array( $args['std'] ) ) {
+			foreach ( $defaults as $k => $v ) {
+				if ( '' == $v && isset( $args['std'][$k] ) ) {
+					$defaults[$k] = $args['std'][$k];
+				}
+			}
+		}
 
 		$value = $this->get_value( $key, $defaults );
 
@@ -914,7 +950,7 @@ class WF_Fields {
 	 */
 	protected function render_field_textarea ( $key, $args ) {
 		// Explore how best to escape this data, as esc_textarea() strips HTML tags, it seems.
-		$html = '<textarea id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '" cols="42" rows="5">' . $this->get_value( $key, $args['std'] ) . '</textarea>' . "\n";
+		$html = '<textarea id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '" cols="42" rows="5">' . stripslashes( $this->get_value( $key, $args['std'] ) ) . '</textarea>' . "\n";
 		return $html;
 	} // End render_field_textarea()
 
@@ -1547,6 +1583,9 @@ class WF_Fields {
 
 		$current_section = '';
 		foreach ( $data as $k => $v ) {
+			$field_counter = 0;
+			$field_counter++;
+
 			if ( in_array( $v['type'], array( 'heading', 'subheading' ) ) ) {
 				$current_section = $this->_generate_section_token( $v['name'] );
 				continue; // Ignore headings and sub-headings.
@@ -1577,7 +1616,19 @@ class WF_Fields {
 			// Add the field to the fields property.
 			$v['section'] = $current_section;
 
-			$key = $v['id'];
+			$key = '';
+			if ( isset( $v['id'] ) ) {
+				$key = $v['id'];
+			} else {
+				if ( isset( $v['name'] ) ) {
+					$key = sanitize_title_with_dashes( $v['name'] );
+				}
+			}
+
+			// Make sure we always have a key.
+			if ( '' == $key ) {
+				$key = 'field-' . $field_counter;
+			}
 
 			// Avoid duplicate keys by creating an adjusted key.
 			if ( isset( $this->_fields[$key] ) ) {
@@ -1592,10 +1643,29 @@ class WF_Fields {
 				$key = $new_key;
 			}
 
+			// Cater for slider fields and create the necessary options, if none are present.
+			if ( 'slider' == $v['type'] && ! isset( $v['options'] ) ) {
+				if ( isset( $v['min'] ) && isset( $v['max'] ) ) {
+					$increment = 1;
+					$min = intval( $v['min'] );
+					$max = intval( $v['max'] );
+					if ( isset( $v['increment'] ) ) {
+						$increment = intval( $v['increment'] );
+					}
+
+					if ( $max > $min ) {
+						$options = array();
+						for ( $i = $min; $i <= $max; $i+=$increment ) {
+							$options[$i] = $i;
+						}
+						$v['options'] = $options;
+					}
+				}
+			}
 
 			$this->_fields[$key] = $v;
 		}
-
+		$this->_fields = apply_filters( 'wf_fields_init_fields', $this->_fields, $this->_fields );
 		return $this->_fields;
 	} // End init_fields()
 

@@ -20,6 +20,39 @@ function wf_setup_screen_header_footer () {
 add_action( 'admin_init', 'wf_setup_screen_header_footer' );
 
 /**
+ * Set the default placeholder image URL to the default image provided within the WooFramework.
+ * @since  6.0.1
+ * @param  string $url The current empty placeholder image URL.
+ * @return string      The default placeholder image URL.
+ */
+function wf_set_default_placeholder_image_url ( $url ) {
+	if ( '' == $url ) {
+		return WF()->get_assets_url() . 'images/placeholder.png';
+	} else {
+		return $url;
+	}
+} // End wf_set_default_placeholder_image_url()
+
+/**
+ * Set the default placeholder image path to the default image provided within the WooFramework.
+ * @since  6.0.1
+ * @param  string $path The current empty placeholder image path.
+ * @return string       The default placeholder image path.
+ */
+function wf_set_default_placeholder_image_path ( $path ) {
+	if ( '' == $path ) {
+		return WF()->get_assets_path() . 'images/placeholder.png';
+	} else {
+		return $path;
+	}
+} // End wf_set_default_placeholder_image_path()
+
+if ( true == (bool)apply_filters( 'wf_use_default_placeholder_image', false ) ) {
+	add_filter( 'wf_placeholder_image_url', 'wf_set_default_placeholder_image_url' );
+	add_filter( 'wf_placeholder_image_path', 'wf_set_default_placeholder_image_path' );
+}
+
+/**
  * Enqueue menu.css.
  * Used to control the display of WooFramework menu items across the dashboard
  * @since  6.0.0

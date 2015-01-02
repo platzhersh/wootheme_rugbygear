@@ -285,13 +285,13 @@ class WF_Screen_Admin_Base {
 	 * @return  array key => value pairs of the plugin slug => name.
 	 */
 	protected function _get_plugins_to_look_for () {
-		return array(
+		return (array)apply_filters( 'wf_get_plugins_to_look_for', array(
 					'woocommerce/woocommerce.php' => array( 'name' => __( 'WooCommerce', 'woothemes' ), 'description' => __( 'An ecommerce toolkit to help you sell anything. Beautifully.', 'woothemes' ), 'global' => false ),
 					'testimonials-by-woothemes/woothemes-testimonials.php' => array( 'name' => __( 'Testimonials', 'woothemes' ), 'description' => __( 'Share customer testimonials with your visitors.', 'woothemes' ), 'global' => false ),
 					'features-by-woothemes/woothemes-features.php' => array( 'name' => __( 'Features', 'woothemes' ), 'description' => __( 'Display the features or services you offer.', 'woothemes' ), 'global' => false ),
 					'our-team-by-woothemes/woothemes-our-team.php' => array( 'name' => __( 'Our Team', 'woothemes' ), 'description' => __( 'Showcase your team members and the roles they play.', 'woothemes' ), 'global' => false ),
 					'projects-by-woothemes/projects.php' => array( 'name' => __( 'Projects', 'woothemes' ), 'description' => __( 'Showcase your recent projects.', 'woothemes' ), 'global' => false )
-				);
+				) );
 	} // End _get_plugins_to_look_for()
 } // End Class
 ?>

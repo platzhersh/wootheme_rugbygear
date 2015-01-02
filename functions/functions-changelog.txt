@@ -1,5 +1,57 @@
 *** WooThemes Framework Changelog ***
 
+2014.12.01 - version 6.1.0
+ * Update - Removes timthumb from the framework and converts old custom fields into Featured Images.
+   /admin-functions.php,
+   /deprecated.php,
+   /thumb.php,
+   /classes/class-wf-fields.php
+ * Fix - Open Sans font weights
+   /admin-functions.php
+ * Fix - Allow the script tag source attribute within the advertisement settings field
+  /classes/class-wf-fields-settings.php
+
+2014.09.04 - version 6.0.4
+ * Fix - Adds support for the woo_ad_top_adsense field to support <script> tags.
+   /classes/class-wf-fields-settings.php
+ * Fix - Ensures the Bold/Italic font style outputs correctly on "typography" fields.
+   /classes/class-wf-fields.php
+ * Fix - Adjusts the separator in the breadcrumb taxonomy term parents handler to account for taxonomy terms containing a comma in the name.
+   admin-functions.php
+ * Fix - Ensures there is always a field key present, even if the "id" parameter isn't available.
+   /classes/class-wf-fields.php
+
+2014.07.30 - version 6.0.3
+ * Fix - Ensures the typography fields correctly interpret typeface names containing quotation marks.
+   /classes/class-wf-fields.php
+ * Fix - Makes sure woo_title()'s parameter is always a boolean before running through the rest of the code.
+   /admin-functions.php
+ * New - Adds a filter on the _get_plugins_to_look_for() method, to allow themes/child themes to specify other WordPress.org plugins which they integrate with.
+   /classes/class-wf-screen-admin-base.php
+
+2014.07.17 - version 6.0.2
+ * Fix - Ensures that EM size values (floats, instead of integers) are correctly parsed and preserved when saving a "typography" field.
+ * Fix - Ensures system fonts are correctly displayed in the select box for a "typography" field, when one is selected.
+
+2014.07.15 - version 6.0.1
+ * Fix - Ensures 'slider' fields in older themes are correctly output.
+   /classes/class-wf-fields.php
+   /assets/css/fields.css
+ * Fix - Slashes are now stripped from within textarea fields.
+   /classes/class-wf-fields.php
+ * Fix - Ensure the Google Analytics tracking code field handles script tags correctly.
+   /classes/class-wf-fields.php
+   /classes/class-wf-fields-settings.php
+ * Fix - Placeholder images are empty by default. Adds logic to enable a default placeholder image via a filter.
+   /classes/class-wf.php
+   /admin-interface.php
+ * Fix - Replace the use of array_replace() with a small loop, to cater for PHP 5.2 installations.
+   /admin-functions.php
+ * Fix - Ensures the custom excerpt text is called correctly, when calling get_the_excerpt() or the_excerpt().
+   /admin-shortcodes.php
+ * Fix - Ensure the defaults for "border" and "typography" fields are correctly represented on the theme settings screen, on fresh installations.
+  /classes/class-wf-fields.php
+
 2014.07.03 - version 6.0.0
  * New - Introduce new classes.
    /classes/class-wf.php - Base class

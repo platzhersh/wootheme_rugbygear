@@ -122,8 +122,14 @@ add_action( 'loop_end', 'maybe_restore_trim_excerpt' );
  * @return string       The modified excerpt text.
  */
 function woo_remove_dropcap_from_excerpts ( $text ) {
+	global $post;
+	$original_text = $text; // Make a backup of the info passed through.
 	remove_shortcode( 'dropcap' );
-	$text = get_the_content();
+	if ( '' != $post->post_excerpt ) {
+		$text = $original_text;
+	} else {
+		$text = get_the_content();
+	}
 	$text = str_replace( '[/dropcap]', '', str_replace( '[dropcap]', '', $text ) );
 	add_shortcode( 'dropcap', 'woo_shortcode_dropcap' );
 

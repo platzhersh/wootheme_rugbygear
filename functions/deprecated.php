@@ -1368,5 +1368,120 @@ if ( ! function_exists( 'woothemes_machine' ) ) {
 
 		return array( $output, $menu, $menu_items );
 	} // End woothemes_machine()
+
+    /**
+     * timthumb_deprecated handles legacy timthumb logic
+     * @since 6.1.0
+     * @param  array  $args old timthumb arguments
+     * @return html markup output
+     */
+    function timthumb_deprecated( $args = array() ) {
+
+        //Defaults
+        $output = '';
+        $src_arr = array();
+        $attachment_id = array();
+        $id = null;
+        $meta = '';
+        $alt = '';
+        $thumb_id = '';
+        $alignment = '';
+        $width = null;
+        $height = null;
+        $quality = 90;
+        $class = '';
+        $set_width = '';
+        $set_height = '';
+        $before = '';
+        $after ='';
+        $link = 'src';
+        $is_auto_image = false;
+        $single = false;
+
+        if ( ! is_array( $args ) )
+            parse_str( $args, $args );
+
+        extract( $args );
+
+        foreach( $src_arr as $key => $custom_field ) {
+
+            // Clean the image URL
+            $href = esc_url( $custom_field );
+            $custom_field = cleanSource( $custom_field );
+
+            // Check if WPMU and set correct path AND that image isn't external
+            if ( function_exists( 'get_current_site') ) {
+                get_current_site();
+                //global $blog_id; Breaks with WP3 MS
+                if ( !isset($blog_id) || !$blog_id ) {
+                    global $current_blog;
+                    $blog_id = $current_blog->blog_id;
+                }
+                if ( isset($blog_id) && $blog_id > 0 ) {
+                    $imageParts = explode( 'files/', $custom_field );
+                    if ( isset( $imageParts[1] ) )
+                        $custom_field = '/blogs.dir/' . $blog_id . '/files/' . $imageParts[1];
+                }
+            }
+
+            //Set the ID to the Attachment's ID if it is an attachment
+            if($is_auto_image == true){
+                $quick_id = $attachment_id[$key];
+            } else {
+                $quick_id = $id;
+            }
+
+            //Set custom meta
+            if ($meta) {
+                $alt = $meta;
+                $title = 'title="' . esc_attr( $meta ) . '"';
+            } else {
+                if ( ( $alt != '' ) || ! ( $alt = get_post_meta( $thumb_id, '_wp_attachment_image_alt', true ) ) ) {
+                    $alt = esc_attr( get_post_meta( $thumb_id, '_wp_attachment_image_alt', true ) );
+                } else {
+                    $alt = esc_attr( get_the_title( $quick_id ) );
+                }
+                $title = 'title="'. esc_attr( get_the_title( $quick_id ) ) .'"';
+            }
+
+            // Set alignment parameter
+            if ( $alignment != '' )
+                $alignment = '&amp;a=' . urlencode( $alignment );
+
+            $img_url = esc_url( get_template_directory_uri() . '/functions/thumb.php?src=' . $custom_field . '&amp;w=' . $width . '&amp;h=' . $height . '&amp;zc=1&amp;q=' . $quality . $alignment );
+            $img_link = '<img src="' . $img_url . '" alt="' . esc_attr( $alt ) . '" class="' . esc_attr( stripslashes( $class ) ) . '" ' . $set_width . $set_height . ' />';
+
+            if( $link == 'img' ) {  // Just output the image
+                $output .= wp_kses_post( $before );
+                $output .= $img_link;
+                $output .= wp_kses_post( $after );
+
+            } elseif( $link == 'url' ) {  // Output the image without anchors
+
+                if($is_auto_image == true){
+                    $src = wp_get_attachment_image_src($thumb_id, 'large', true);
+                    $custom_field = esc_url( $src[0] );
+                }
+                $output .= $href;
+
+            } else {  // Default - output with link
+
+                if ( ( is_single() || is_page() ) && $single == false ) {
+                    $rel = 'rel="lightbox"';
+                } else {
+                    $href = get_permalink( $id );
+                    $rel = '';
+                }
+
+                $output .= wp_kses_post( $before );
+                $output .= '<a ' . $title . ' href="' . esc_url( $href ) . '" ' . $rel . '>' . $img_link . '</a>';
+                $output .= wp_kses_post( $after );
+            }
+        }
+
+        return $output;
+
+    } // End timthumb_deprecated()
+
 }
 ?>

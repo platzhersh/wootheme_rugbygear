@@ -205,7 +205,7 @@ class WF_Meta {
 	public function meta_box_content ( $post, $args ) {
 		$field_data = $this->get_settings_template();
 		$field_data = $this->setup_fields( $field_data );
-		$this->_field_obj->__set( 'sections', array( $args['id'] ) );
+		$this->_field_obj->__set( 'sections', array( $args['id'] => '' ) ); // Make sure our ID is an array key in the sections array.
 		$this->_field_obj->__set( 'fields', $field_data );
 		$this->_field_obj->render();
 	} // End settings_screen()

@@ -171,6 +171,9 @@
 	----------------------------------*/
   /* Corner radius */
 }
+.wf-field-slider .chosen-container {
+  display: none;
+}
 .wf-field-slider .slider-value {
   position: relative;
   bottom: 16px;

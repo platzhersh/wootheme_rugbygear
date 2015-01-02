@@ -94,7 +94,7 @@ var wooDialogHelper = {
     },
 
     setupShortcodeType: function ( shortcode ) {
-        wooSelectedShortcodeType = shortcode;
+        this.wooSelectedShortcodeType = shortcode;
     },
 
     setUpColourPicker: function () {
@@ -130,14 +130,14 @@ var wooDialogHelper = {
     },
 
     loadShortcodeDetails: function () {
-        if (wooSelectedShortcodeType) {
+        if ( this.wooSelectedShortcodeType ) {
 
             var a = this;
-            jQuery.getScript(shortcode_generator_url + "shortcodes/" + wooSelectedShortcodeType + ".js", function () {
+            jQuery.getScript(shortcode_generator_url + "shortcodes/" + this.wooSelectedShortcodeType + ".js", function () {
                 a.initializeDialog();
 
                 // Set the default content to the highlighted text, for certain shortcode types.
-                switch ( wooSelectedShortcodeType ) {
+                switch ( this.wooSelectedShortcodeType ) {
                     case 'box':
                     case 'ilink':
                     case 'quote':
@@ -160,7 +160,7 @@ var wooDialogHelper = {
         // Clean out the table rows before applying the new ones.
         jQuery( '#woo-options-table' ).html( '' );
         if (typeof wooShortcodeMeta == "undefined") {
-            jQuery( '#woo-options' ).append( "<p>Error loading details for shortcode: " + wooSelectedShortcodeType + "</p>" );
+            jQuery( '#woo-options' ).append( "<p>Error loading details for shortcode: " + this.wooSelectedShortcodeType + "</p>" );
         } else {
             if (wooShortcodeMeta.disablePreview) {
                 jQuery( '#woo-preview' ).remove();
