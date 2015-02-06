@@ -4,7 +4,105 @@ Template Name: Stock Report
 Source: http://mikejolley.com/2011/12/woocommerce-output-a-simple-printable-stockinventory-report/
 modified by @platzh1rsch, 07-28-2014
 */
+
+// check if user is allowed to see the page
 if (!is_user_logged_in() || !current_user_can('manage_options')) wp_die('This page is private.');
+
+// wp queries
+$simple_query = array(
+					'post_type'	=> 'product',
+					'post_status' => 'publish',
+					'posts_per_page' => -1,
+					'orderby'	=> 'title',
+					'order'	=> 'ASC',
+					'meta_query' => array(
+						array(
+							'key' => '_manage_stock',
+							'value' => 'yes'
+							)
+						),
+					'tax_query' => array(
+						array(
+							'taxonomy' => 'product_type',
+							'field' => 'slug',
+							'terms' => array('simple'),
+							'operator' => 'IN'
+							)
+						)
+					);
+$variation_query = array(
+					'post_type'	=> 'product_variation',
+					'post_status' => 'publish',
+					'posts_per_page' => -1,
+					'orderby'	=> 'title',
+					'order'	=> 'ASC',
+					'meta_query' => array(
+						array(
+							'key' => '_stock',
+							'value' => array('', false, null),
+							'compare' => 'NOT IN'
+							)
+						)
+					);
+
+// check if user clicked "Export to CSV"
+
+if (isset($_GET["download"])) {
+
+	// variables
+	$filename = "rugbygear-inventar.csv";
+	$delimiter = ';';
+
+	// output headers so that the file is downloaded rather than displayed
+	header('Content-Type: text/csv; charset=utf-8');
+	header('Content-Disposition: attachment; filename='.$filename);
+
+	// create a file pointer connected to the output stream
+	$output = fopen('php://output', 'w');
+
+	// output the column headings
+	fputcsv($output, array('SKU', 'Brand', 'Bezeichnung', 'Stueckpreis', 'Stueckzahl'), $delimiter);
+
+	// fetch the data
+	//mysql_connect('localhost', 'username', 'password');
+	//mysql_select_db('database');
+	//$rows = mysql_query('SELECT field1,field2,field3 FROM table');
+
+	// simple products
+	$loop = new WP_Query( $simple_query );
+	while ( $loop->have_posts() ) : $loop->the_post();
+		global $product;
+		$arr = array($product->sku, "", $product->get_title(), $product->price, $product->stock);
+		fputcsv($output, $arr, $delimiter);	
+	endwhile;
+
+	// variations
+
+
+	$loop = new WP_Query( $variation_query );
+	while ( $loop->have_posts() ) : $loop->the_post();
+		$product = new WC_Product_Variation( $loop->post->ID );
+
+		$attr = $product->get_variation_attributes();
+						$attrlist = " (";
+						foreach ($attr as $valuekey => $value) {
+							$attrlist .= "$value,";
+							
+							//echo $value+",";
+						} 
+						$attrlist = substr($attrlist,0,-1);
+						$attrlist .= ")";
+
+		$arr = array($product->sku, "", $product->get_title() . $attrlist, $product->price, $product->stock);	
+		fputcsv($output, $arr, $delimiter);
+	endwhile;
+
+
+} else {
+
+	// get theme uri
+	$theme_uri = get_template_directory_uri();
+
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -18,10 +116,10 @@ if (!is_user_logged_in() || !current_user_can('manage_options')) wp_die('This pa
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	
 	
-	<link rel="stylesheet" type="text/css" href="/wp-content/themes/mystile/includes/bootstrap-3.2.0-dist/css/bootstrap.min.css" />
-	<link rel="stylesheet" type="text/css" href="/wp-content/themes/mystile/includes/css/footable.core.min.css" />
+	<link rel="stylesheet" type="text/css" href="<?= $theme_uri ?>/includes/bootstrap-3.2.0-dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="<?= $theme_uri ?>/includes/css/footable.core.min.css" />
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
-	<script type="text/javascript" src="/wp-content/themes/mystile/includes/js/footable.all.min.js"></script>
+	<script type="text/javascript" src="<?= $theme_uri ?>/includes/js/footable.all.min.js"></script>
 
 
 
@@ -56,28 +154,7 @@ if (!is_user_logged_in() || !current_user_can('manage_options')) wp_die('This pa
 				<!-- Simple Products -->
 				<?php
 				
-				$args = array(
-					'post_type'	=> 'product',
-					'post_status' => 'publish',
-					'posts_per_page' => -1,
-					'orderby'	=> 'title',
-					'order'	=> 'ASC',
-					'meta_query' => array(
-						array(
-							'key' => '_manage_stock',
-							'value' => 'yes'
-							)
-						),
-					'tax_query' => array(
-						array(
-							'taxonomy' => 'product_type',
-							'field' => 'slug',
-							'terms' => array('simple'),
-							'operator' => 'IN'
-							)
-						)
-					);
-				$loop = new WP_Query( $args );
+				$loop = new WP_Query( $simple_query );
 				while ( $loop->have_posts() ) : $loop->the_post();
 				global $product;
 				?>
@@ -101,21 +178,7 @@ if (!is_user_logged_in() || !current_user_can('manage_options')) wp_die('This pa
 				
 				<!-- Variations -->
 				<?php
-				$args = array(
-					'post_type'	=> 'product_variation',
-					'post_status' => 'publish',
-					'posts_per_page' => -1,
-					'orderby'	=> 'title',
-					'order'	=> 'ASC',
-					'meta_query' => array(
-						array(
-							'key' => '_stock',
-							'value' => array('', false, null),
-							'compare' => 'NOT IN'
-							)
-						)
-					);
-				$loop = new WP_Query( $args );
+				$loop = new WP_Query( $variation_query );
 				while ( $loop->have_posts() ) : $loop->the_post();
 				$product = new WC_Product_Variation( $loop->post->ID );
 				?>
@@ -170,3 +233,9 @@ if (!is_user_logged_in() || !current_user_can('manage_options')) wp_die('This pa
 
 	</body>
 	</html>
+
+<?php 
+
+}
+
+?>
